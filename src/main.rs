@@ -50,7 +50,7 @@ async fn main() {
     let app = Router::new()
         .route("/", get(|| async { "Hello, Rust!" }))
         .route("/create-user", post(create_user))
-        .route("/users", get(list_orders));
+        .route("/orders", get(list_orders));
 
     println!("Running on http://localhost:3000");
     // Start Server
