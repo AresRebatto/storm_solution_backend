@@ -1,9 +1,4 @@
-//use std::{collections::HashMap, thread::panicking};
-use serde_json::Value;
 use axum::{
-    //body::Body,
-    //http::{Request, StatusCode},
-    //response::{IntoResponse, Response},
     routing::{get, post},
     Json, Router,
 };
@@ -24,16 +19,9 @@ async fn list_pcenters() -> Json<Vec<PCenters>>{
     return Json(p_centers);
 }
 
-async fn list_orders(payload: Option<Json<Value>>) -> Json<Vec<Orders>> {
-    let mut _body: HttpBody;
-    if let Some(payload) = payload{
-        _body = HttpBody{
-            gatto : payload.0["gatto"].clone()
-        }
-    }else{
-        panic!("Manca il corpo della richiesta http");
-    }
-    println!("{:?}", _body.gatto);
+async fn list_orders(body: String) -> Json<Vec<Orders>> {
+    let mut _body: HttpBody = serde_json::from_str(&body).unwrap();
+    
     let orders: Vec<Orders> = vec![
         Orders {
             pk_order: 1,

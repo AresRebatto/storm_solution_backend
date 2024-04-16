@@ -1,7 +1,10 @@
-use serde_json::Value;
 use serde::Deserialize;
 
 #[derive(Deserialize, Debug)]
 pub struct HttpBody{
-    pub gatto: Value,
+    pub p_center: String,
+    pub date_time_from: String,
+    pub date_time_to: String,
+    pub order_type: i32,
+    pub pk_order: i32,
 }
