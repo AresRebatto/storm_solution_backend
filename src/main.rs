@@ -1,25 +1,40 @@
+//use std::{collections::HashMap, thread::panicking};
+use serde_json::Value;
 use axum::{
-    body::Body,
-    http::StatusCode,
-    response::{IntoResponse, Response},
+    //body::Body,
+    //http::{Request, StatusCode},
+    //response::{IntoResponse, Response},
     routing::{get, post},
     Json, Router,
 };
 mod modules;
-use modules::orders::Orders;
+use modules::{orders::Orders, pcenters::PCenters, http_body::HttpBody};
 
 
 
-// Handler for /create-user
-async fn create_user() -> impl IntoResponse {
-    Response::builder()
-        .status(StatusCode::CREATED)
-        .body(Body::from("User created successfully"))
-        .unwrap()
+async fn list_pcenters() -> Json<Vec<PCenters>>{
+    let p_centers: Vec<PCenters> = vec![
+        PCenters{
+            pk_center: 1,
+            p_center_description: String::from("Pizzeria"),
+            detination: String::from("something")
+        }
+    ];
+
+    return Json(p_centers);
 }
-// Handler for /users
-async fn list_orders() -> Json<Vec<Orders>> {
-    let orders = vec![
+
+async fn list_orders(payload: Option<Json<Value>>) -> Json<Vec<Orders>> {
+    let mut _body: HttpBody;
+    if let Some(payload) = payload{
+        _body = HttpBody{
+            gatto : payload.0["gatto"].clone()
+        }
+    }else{
+        panic!("Manca il corpo della richiesta http");
+    }
+    println!("{:?}", _body.gatto);
+    let orders: Vec<Orders> = vec![
         Orders {
             pk_order: 1,
             opening_datetime: None,
@@ -41,7 +56,9 @@ async fn list_orders() -> Json<Vec<Orders>> {
             bill_details: vec![],
         },
     ];
-    Json(orders)
+
+
+    return Json(orders)
 }
 
 #[tokio::main]
@@ -49,8 +66,8 @@ async fn main() {
     // Define Routes
     let app = Router::new()
         .route("/", get(|| async { "Hello, Rust!" }))
-        .route("/create-user", post(create_user))
-        .route("/orders", get(list_orders));
+        .route("/pcenters", get(list_pcenters))
+        .route("/orders", post(list_orders));
 
     println!("Running on http://localhost:3000");
     // Start Server
