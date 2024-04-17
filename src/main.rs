@@ -4,6 +4,7 @@ use axum::{
 };
 mod modules;
 use modules::{orders::Orders, pcenters::PCenters, http_body::HttpBody};
+use local_ip_address::local_ip;
 
 
 
@@ -51,15 +52,17 @@ async fn list_orders(body: String) -> Json<Vec<Orders>> {
 
 #[tokio::main]
 async fn main() {
+    let my_local_ip = local_ip().unwrap();
     // Define Routes
     let app = Router::new()
         .route("/", get(|| async { "Hello, Rust!" }))
         .route("/pcenters", get(list_pcenters))
         .route("/orders", post(list_orders));
 
-    println!("Running on http://localhost:3000");
+    println!("Running on http://{:?}:3000", my_local_ip);
+    let address = format!("{}:3000", my_local_ip);
     // Start Server
-    axum::Server::bind(&"127.0.0.1:3000".parse().unwrap())
+    axum::Server::bind(&address.parse().unwrap())
         .serve(app.into_make_service())
         .await
         .unwrap();
